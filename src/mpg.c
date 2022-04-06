@@ -1,9 +1,8 @@
-#include <stdbool.h>
+#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
-#include <unistd.h>
 
 #include "mpg.h"
 
@@ -92,28 +91,54 @@ int buildDirectory(struct Project *project) {
     return 0;
 }
 
+void printVersion() {
+    printf("mpg version %d.%d\n", VERSION_MAJ, VERSION_MIN);
+}
+
+void printHelp() {
+    printVersion();
+    puts("Usage: mpg [OPTION]... [NAME]");
+    puts("Create a new C/C++ Makefile project.\n");
+    puts("Options:");
+    puts("  -v, --version");
+    puts("      Print version and exit.");
+    puts("  -h, --help");
+    puts("      Print this message and exit.");
+    puts("  -+, --c++");
+    puts("      Use C++ instead of C.");
+    puts("  -c, --compiler [COMPILER]");
+    puts("      Specify the compiler to use.");
+    puts("  -s, --std [STANDARD]");
+    puts("      Specify the standard to use.");
+}
+
 struct Project *getOptions(int argc, char **argv) {
-    int opt;
-    bool cxx = false;
+    int opt, optidx;
+    int cxx = 0;
     char *name, *compiler, *std;
-    while ((opt = getopt(argc, argv, "vh+c:s:")) != -1) {
+    struct option long_options[] = {
+            {"version", no_argument, 0, 'v'},
+            {"help", no_argument, 0, 'h'},
+            {"c++", no_argument, &cxx, 1},
+            {"compiler", required_argument, 0, 'c'},
+            {"std", required_argument, 0, 's'},
+            {0, 0, 0, 0}
+    };
+
+    while ((opt = getopt_long(argc, argv, "vh+c:s:", long_options, &optidx)) != -1) {
         switch (opt) {
+            case 0:
+                break;
             case 'v':
-                printf("mpg v%u.%u\n", VERSION_MAJ, VERSION_MIN);
+                printVersion();
                 exit(0);
                 break;
             case 'h':
-                puts("mpg: Makefile Project Generator");
-                puts("Flags:");
-                puts("v -- display version and exit");
-                puts("h -- display this message and exit");
-                puts("+ -- use C++ instead of C");
-                puts("c -- specify the compiler");
-                puts("s -- specify the standard");
+                printHelp();
                 exit(0);
                 break;
             case '+':
-                cxx = true;
+                cxx = 1;
                 break;
             case 'c':
                 compiler = malloc(strlen(optarg) + 1);
@@ -126,10 +151,8 @@ struct Project *getOptions(int argc, char **argv) {
             case '?':
                 exit(1);
                 break;
-            case ':':
-                printf("mpg: option '%c' needs a value", optopt);
-                exit(1);
-                break;
+            default:
+                abort();
         }
     }
     if (optind < argc) {
