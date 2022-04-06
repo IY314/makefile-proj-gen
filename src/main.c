@@ -3,16 +3,21 @@
 #include "mpg.h"
 
 int main(int argc, char **argv) {
-    struct Project *proj = getOptions(argc, argv);
+    struct Project *proj = get_proj(argc, argv);
+    if (proj == NULL) {
+        puts(mpg_msg);
+        mpg_quit();
+        return mpg_status;
+    }
 
-    int status = buildDirectory(proj);
+    int status = build_proj_dir(proj);
     if (status == 0) {
         printf("mpg: created project '%s'\n", proj->name);
     } else {
         printf("mpg: failed to create project '%s'\n", proj->name);
     }
 
-    freeProject(proj);
+    destroy_proj(proj);
 
     return 0;
 }

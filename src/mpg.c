@@ -6,7 +6,10 @@
 
 #include "mpg.h"
 
-struct Project *makeProject(char *name, char *compiler, char *std, int cxx) {
+char *mpg_msg = NULL;
+int mpg_status = 0;
+
+struct Project *init_proj(char *name, char *compiler, char *std, int cxx) {
     struct Project *project = malloc(sizeof(struct Project));
     project->name = malloc(strlen(name) + 1);
     project->compiler = malloc(strlen(compiler) + 1);
@@ -18,12 +21,12 @@ struct Project *makeProject(char *name, char *compiler, char *std, int cxx) {
     return project;
 }
 
-void freeProject(struct Project *project) {
+void destroy_proj(struct Project *project) {
     free(project->name);
     free(project);
 }
 
-int buildDirectory(struct Project *project) {
+int build_proj_dir(struct Project *project) {
     int status;
     
     status = mkdir(project->name, S_IRWXU);
@@ -91,28 +94,17 @@ int buildDirectory(struct Project *project) {
     return 0;
 }
 
-void printVersion() {
-    printf("mpg version %d.%d\n", VERSION_MAJ, VERSION_MIN);
+void version() {
+    mpg_msg = malloc(sizeof(char) * 32);
+    sprintf(mpg_msg, "mpg version %d.%d\n", VERSION_MAJ, VERSION_MIN);
 }
 
-void printHelp() {
-    printVersion();
-    puts("Usage: mpg [OPTION]... [NAME]");
-    puts("Create a new C/C++ Makefile project.\n");
-    puts("Options:");
-    puts("  -v, --version");
-    puts("      Print version and exit.");
-    puts("  -h, --help");
-    puts("      Print this message and exit.");
-    puts("  -+, --c++");
-    puts("      Use C++ instead of C.");
-    puts("  -c, --compiler [COMPILER]");
-    puts("      Specify the compiler to use.");
-    puts("  -s, --std [STANDARD]");
-    puts("      Specify the standard to use.");
+void help() {
+    mpg_msg = malloc(sizeof(char) * 319);
+    strcpy(mpg_msg, "Usage: mpg [OPTION]... [NAME]\n\nCreate a new C/C++ Makefile project.\n\nOptions:\n  -v, --version\n      Print version and exit.\n  -h, --help\n      Print this message and exit.\n  -+, --cxx\n      Create a C++ project.\n  -c, --compiler\n      Specify the compiler to use.\n  -s, --std\n      Specify the C/C++ standard to use.\n\n");
 }
 
-struct Project *getOptions(int argc, char **argv) {
+struct Project *get_proj(int argc, char **argv) {
     int opt, optidx;
     int cxx = 0;
     char *name, *compiler, *std;
@@ -130,12 +122,12 @@ struct Project *getOptions(int argc, char **argv) {
             case 0:
                 break;
             case 'v':
-                printVersion();
-                exit(0);
+                version();
+                return NULL;
                 break;
             case 'h':
-                printHelp();
-                exit(0);
+                help();
+                return NULL;
                 break;
             case '+':
                 cxx = 1;
@@ -149,18 +141,21 @@ struct Project *getOptions(int argc, char **argv) {
                 strcpy(std, optarg);
                 break;
             case '?':
-                exit(1);
+                return NULL;
                 break;
             default:
                 abort();
+                break;
         }
     }
     if (optind < argc) {
         name = malloc(strlen(argv[optind]) + 1);
         strcpy(name, argv[optind]);
     } else {
-        puts("mpg: no name provided for project");
-        exit(1);
+        mpg_msg = malloc(34);
+        mpg_status = 1;
+        strcpy(mpg_msg, "mpg: no name provided for project");
+        return NULL;
     }
 
     if (compiler == NULL) {
@@ -173,10 +168,14 @@ struct Project *getOptions(int argc, char **argv) {
         strcpy(std, cxx ? "c++11" : "c99");
     }
 
-    struct Project *project = makeProject(name, compiler, std, cxx);
+    struct Project *project = init_proj(name, compiler, std, cxx);
     free(name);
     free(compiler);
     free(std);
 
     return project;
+}
+
+void mpg_quit() {
+    free(mpg_msg);
 }

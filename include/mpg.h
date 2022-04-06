@@ -14,7 +14,7 @@
 #define CXX_SOURCE \
 "#include <iostream>\n" \
 "\n" \
-"int main(void) {\n" \
+"int main() {\n" \
 "    std::cout << \"Hello, World!\" << std::endl;\n" \
 "    return 0;\n" \
 "}\n"
@@ -47,15 +47,20 @@
 "clean:\n" \
 "\trm -rf $(TARGET) obj\n"
 
+extern char *mpg_msg;
+extern int mpg_status;
+
 struct Project {
     char *name, *compiler, *std;
     int cxx;
 };
 
-struct Project *makeProject(char *name, char *compiler, char *std, int cxx);
+struct Project *init_proj(char *name, char *compiler, char *std, int cxx);
 
-int buildDirectory(struct Project *project);
+int build_proj_dir(struct Project *project);
 
-struct Project *getOptions(int argc, char **argv);
+struct Project *get_proj(int argc, char **argv);
 
-void freeProject(struct Project *project);
+void destroy_proj(struct Project *project);
+
+void mpg_quit();
