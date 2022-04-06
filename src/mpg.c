@@ -117,12 +117,21 @@ struct Project *getOptions(int argc, char **argv) {
     int cxx = 0;
     char *name, *compiler, *std;
     struct option long_options[] = {
+<<<<<<< HEAD
         {"version", no_argument, 0, 'v'},
         {"help", no_argument, 0, 'h'},
         {"c++", no_argument, &cxx, 1},
         {"compiler", required_argument, 0, 'c'},
         {"std", required_argument, 0, 's'},
         {0, 0, 0, 0}
+=======
+            {"version", no_argument, 0, 'v'},
+            {"help", no_argument, 0, 'h'},
+            {"c++", no_argument, &cxx, 1},
+            {"compiler", required_argument, 0, 'c'},
+            {"std", required_argument, 0, 's'},
+            {0, 0, 0, 0}
+>>>>>>> db4b17c323447d8ba5dce68ff40eb341fc95c112
     };
 
     while ((opt = getopt_long(argc, argv, "vh+c:s:", long_options, &optidx)) != -1) {
