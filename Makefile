@@ -1,7 +1,6 @@
 CC := clang
 WFLAGS := -Wall -Werror -Wextra
-IFLAGS := -Iinclude
-OFLAGS := -c ${WFLAGS} ${IFLAGS}
+OFLAGS := -c ${WFLAGS}
 CFLAGS := -o bin/mpg ${WFLAGS}
 
 .PHONY: all link clean clean-objs

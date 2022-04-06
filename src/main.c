@@ -1,8 +1,12 @@
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
+
+#define VERSION_MAJ 1
+#define VERSION_MIN 0
 
 #define C_SOURCE \
 "#include <stdio.h>\n" \
@@ -142,16 +146,76 @@ int buildDirectory(struct Project *project) {
     return 0;
 }
 
-int main() {
-    struct Project *project = makeProject("mpg", "clang", "c99", 0);
-    int status = buildDirectory(project);
-    freeProject(project);
-    if (status == 0) {
-        status = system("make");
-        if (status == -1) {
-            perror("mpg: system");
-            return 1;
+struct Project *getOptions(int argc, char **argv) {
+    int opt;
+    bool cxx = false;
+    char *name, *compiler, *std;
+    while ((opt = getopt(argc, argv, "vh+c:s:")) != -1) {
+        switch (opt) {
+            case 'v':
+                printf("mpg v%u.%u\n", VERSION_MAJ, VERSION_MIN);
+                exit(0);
+                break;
+            case 'h':
+                puts("mpg: Makefile Project Generator");
+                puts("Flags:");
+                puts("v -- display version and exit");
+                puts("h -- display this message and exit");
+                puts("+ -- use C++ instead of C");
+                puts("c -- specify the compiler");
+                puts("s -- specify the standard");
+                exit(0);
+                break;
+            case '+':
+                cxx = true;
+                break;
+            case 'c':
+                compiler = malloc(strlen(optarg) + 1);
+                strcpy(compiler, optarg);
+                break;
+            case 's':
+                std = malloc(strlen(optarg) + 1);
+                strcpy(std, optarg);
+                break;
+            case '?':
+                exit(1);
+                break;
+            case ':':
+                printf("mpg: option '%c' needs a value", optopt);
+                exit(1);
+                break;
         }
     }
+    if (optind < argc) {
+        name = malloc(strlen(argv[optind]) + 1);
+        strcpy(name, argv[optind]);
+    } else {
+        puts("mpg: no name provided for project");
+        exit(1);
+    }
+
+    if (compiler == NULL) {
+        compiler = malloc(sizeof(char) * 4);
+        strcpy(compiler, cxx ? "c++" : "cc");
+    }
+
+    if (std == NULL) {
+        std = malloc(sizeof(char) * 6);
+        strcpy(std, cxx ? "c++11" : "c99");
+    }
+
+    struct Project *project = makeProject(name, compiler, std, cxx);
+    free(name);
+    free(compiler);
+    free(std);
+
+    return project;
+}
+
+int main(int argc, char **argv) {
+    struct Options *opts = getOptions(argc, argv);
+
+    free(opts);
+
     return 0;
 }
