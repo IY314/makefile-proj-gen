@@ -1,23 +1,44 @@
-CC := clang
-WFLAGS := -Wall -Werror -Wextra
-OFLAGS := -c ${WFLAGS}
-CFLAGS := -o bin/mpg ${WFLAGS}
+$(CC) := cc
+WARN := -Wall -Wextra -Werror
+STD := -std=c99
+INCLUDE := -Iinclude
 
-.PHONY: all link clean clean-objs
+EXEC := bin/mpg
+LIB := bin/libmpg.a
+OBJECTS := obj/mpg.o
 
-all: link
+.PHONY: all clean clean-obj clean-lib clean-exec clean-tests
 
-link: bin/main.o
-	${CC} $^ ${CFLAGS}
+all: $(EXEC) $(LIB)
 
-bin/%.o: src/%.c bin
-	${CC} $< -o $@ ${OFLAGS}
+$(EXEC): obj/main.o $(OBJECTS) bin
+	$(CC) $(WARN) $(STD) $< $(OBJECTS) -o $(EXEC)
+
+$(LIB): $(OBJECTS) bin
+	$(AR) -rcs $(LIB) $(OBJECTS)
+
+test-%: test/%.c $(LIB)
+	$(CC) $(WARN) $(INCLUDE) $(STD) -Lbin -lmpg $< -o bin/$@
+
+obj/%.o: src/%.c obj
+	$(CC) $(WARN) $(STD) $(INCLUDE) -c $< -o $@
+
+obj:
+	@mkdir -p obj
 
 bin:
-	mkdir -p bin
+	@mkdir -p bin
 
-clean: clean-objs
-	rm bin/mpg
+clean: clean-obj clean-lib clean-exec
 
-clean-objs:
-	rm bin/*.o
+clean-obj:
+	@rm -rf obj
+
+clean-lib:
+	@rm -rf $(LIB)
+
+clean-exec:
+	@rm -rf $(EXEC)
+
+clean-tests:
+	@rm -rf bin/test-*
