@@ -26,55 +26,30 @@ void destroy_proj(struct Project *project) {
     free(project);
 }
 
+int change_dir(const char *dir) {
+    if (chdir(dir) == -1) {
+        perror("mpg: chdir");
+        return 1;
+    }
+    return 0;
+}
+
+int make_dir(const char *dir) {
+    if (mkdir(dir, S_IRWXU) == -1) {
+        perror("mpg: mkdir");
+        return 1;
+    }
+    return 0;
+}
+
 int build_proj_dir(struct Project *project) {
-    int status;
-    
-    status = mkdir(project->name, S_IRWXU);
-    if (status == -1) {
-        perror("mpg: mkdir");
-        return 1;
-    }
+    if (make_dir(project->name)) return 1;
+    if (change_dir(project->name)) return 1;
+    if (make_dir("src")) return 1;
+    if (make_dir("include")) return 1;
+    if (make_dir("lib")) return 1;
 
-    status = chdir(project->name);
-    if (status == -1) {
-        perror("mpg: chdir");
-        return 1;
-    }
-
-    status = mkdir("src", S_IRWXU);
-    if (status == -1) {
-        perror("mpg: mkdir");
-        return 1;
-    }
-
-    status = mkdir("include", S_IRWXU);
-    if (status == -1) {
-        perror("mpg: mkdir");
-        return 1;
-    }
-
-    status = chdir("src");
-    if (status == -1) {
-        perror("mpg: chdir");
-        return 1;
-    }
-
-    FILE *file = fopen(project->cxx ? "main.cc" : "main.c", "w");
-    if (file == NULL) {
-        perror("mpg: fopen");
-        return 1;
-    }
-
-    fprintf(file, project->cxx ? CXX_SOURCE : C_SOURCE);
-    fclose(file);
-
-    status = chdir("..");
-    if (status == -1) {
-        perror("mpg: chdir");
-        return 1;
-    }
-
-    file = fopen("Makefile", "w");
+    FILE *file = fopen("Makefile", "w");
     if (file == NULL) {
         perror("mpg: fopen");
         return 1;
@@ -85,26 +60,42 @@ int build_proj_dir(struct Project *project) {
     strcpy(compiler_var, project->cxx ? "$(CXX)" : "$(CC)");
     strcpy(ext_var, project->cxx ? "cc" : "c");
 
-    fprintf(file, MAKEFILE_SOURCE, compiler_var, project->compiler, project->std, project->name, compiler_var, ext_var, compiler_var);
+    fprintf(file, MAKEFILE_SOURCE,
+            compiler_var, project->compiler,
+            project->std, project->name,
+            compiler_var, ext_var, compiler_var
+            );
 
     free(compiler_var);
     free(ext_var);
 
     fclose(file);
+
+    if (change_dir("src")) return 1;
+
+    file = fopen(project->cxx ? "main.cc" : "main.c", "w");
+    if (file == NULL) {
+        perror("mpg: fopen");
+        return 1;
+    }
+
+    fprintf(file, project->cxx ? CXX_SOURCE : C_SOURCE);
+    fclose(file);
+
     return 0;
 }
 
-void version() {
+void version(const char *prog) {
     mpg_msg = malloc(sizeof(char) * 32);
-    sprintf(mpg_msg, "mpg version %d.%d\n", VERSION_MAJ, VERSION_MIN);
+    sprintf(mpg_msg, "%s version %d.%d\n", prog, VERSION_MAJ, VERSION_MIN);
 }
 
-void help() {
+void help(const char *prog) {
     mpg_msg = malloc(sizeof(char) * 319);
-    strcpy(mpg_msg, "Usage: mpg [OPTION]... [NAME]\n\nCreate a new C/C++ Makefile project.\n\nOptions:\n  -v, --version\n      Print version and exit.\n  -h, --help\n      Print this message and exit.\n  -+, --cxx\n      Create a C++ project.\n  -c, --compiler\n      Specify the compiler to use.\n  -s, --std\n      Specify the C/C++ standard to use.\n\n");
+    sprintf(mpg_msg, HELP, prog);
 }
 
-struct Project *get_proj(int argc, char **argv) {
+struct Project *get_proj(const char *prog, int argc, char **argv) {
     int opt, optidx;
     int cxx = 0;
     char *name, *compiler, *std;
@@ -122,11 +113,11 @@ struct Project *get_proj(int argc, char **argv) {
             case 0:
                 break;
             case 'v':
-                version();
+                version(prog);
                 return NULL;
                 break;
             case 'h':
-                help();
+                help(prog);
                 return NULL;
                 break;
             case '+':

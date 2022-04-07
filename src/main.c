@@ -3,7 +3,7 @@
 #include "mpg.h"
 
 int main(int argc, char **argv) {
-    struct Project *proj = get_proj(argc, argv);
+    struct Project *proj = get_proj("mpg", argc, argv);
     if (proj == NULL) {
         puts(mpg_msg);
         mpg_quit();

@@ -47,6 +47,23 @@
 "clean:\n" \
 "\trm -rf $(TARGET) obj\n"
 
+#define HELP \
+"Usage: %s [OPTION]... [PROJECT]\n" \
+"\n" \
+"Create a new C/C++ Makefile project.\n" \
+"\n" \
+"Options:\n" \
+"  -v, --version\n" \
+"      Print version and exit.\n" \
+"  -h, --help\n" \
+"      Print this message and exit.\n" \
+"  -+, --cxx\n" \
+"      Create a C++ project.\n" \
+"  -c, --compiler\n" \
+"      Specify the compiler to use.\n" \
+"  -s, --std\n" \
+"      Specify the C/C++ standard to use.\n"
+
 extern char *mpg_msg;
 extern int mpg_status;
 
@@ -59,7 +76,7 @@ struct Project *init_proj(char *name, char *compiler, char *std, int cxx);
 
 int build_proj_dir(struct Project *project);
 
-struct Project *get_proj(int argc, char **argv);
+struct Project *get_proj(const char *prog, int argc, char **argv);
 
 void destroy_proj(struct Project *project);
 
