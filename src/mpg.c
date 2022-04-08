@@ -29,9 +29,9 @@ void destroy_proj(struct Project *project) {
 
 void set_err(char *err) {
     mpg_msg = malloc(256);
-        strcat(mpg_msg, err);
-        strcat(mpg_msg, strerror(errno));
-        mpg_msg = realloc(mpg_msg, strlen(mpg_msg) + 1);
+    strcat(mpg_msg, err);
+    strcat(mpg_msg, strerror(errno));
+    mpg_msg = realloc(mpg_msg, strlen(mpg_msg) + 1);
 }
 
 int change_dir(const char *dir) {
@@ -68,11 +68,8 @@ int build_proj_dir(struct Project *project) {
     strcpy(compiler_var, project->cxx ? "$(CXX)" : "$(CC)");
     strcpy(ext_var, project->cxx ? "cc" : "c");
 
-    fprintf(file, MAKEFILE_SOURCE,
-            compiler_var, project->compiler,
-            project->std, project->name,
-            compiler_var, ext_var, compiler_var
-            );
+    fprintf(file, MAKEFILE_SOURCE, compiler_var, project->compiler,
+            project->std, project->name, compiler_var, ext_var, compiler_var);
 
     free(compiler_var);
     free(ext_var);
@@ -106,17 +103,18 @@ void help(const char *prog) {
 struct Project *get_proj(const char *prog, int argc, char **argv) {
     int opt, optidx;
     int cxx = 0;
-    char *name, *compiler, *std;
-    struct option long_options[] = {
-        {"version", no_argument, 0, 'v'},
-        {"help", no_argument, 0, 'h'},
-        {"c++", no_argument, &cxx, 1},
-        {"compiler", required_argument, 0, 'c'},
-        {"std", required_argument, 0, 's'},
-        {0, 0, 0, 0}
-    };
+    char *name = NULL;
+    char *compiler = NULL;
+    char *std = NULL;
+    struct option long_options[] = {{"version", no_argument, 0, 'v'},
+                                    {"help", no_argument, 0, 'h'},
+                                    {"c++", no_argument, &cxx, 1},
+                                    {"compiler", required_argument, 0, 'c'},
+                                    {"std", required_argument, 0, 's'},
+                                    {0, 0, 0, 0}};
 
-    while ((opt = getopt_long(argc, argv, "vh+c:s:", long_options, &optidx)) != -1) {
+    while ((opt = getopt_long(argc, argv, "vh+c:s:", long_options, &optidx)) !=
+           -1) {
         switch (opt) {
             case 0:
                 break;
@@ -151,6 +149,8 @@ struct Project *get_proj(const char *prog, int argc, char **argv) {
         name = malloc(strlen(argv[optind]) + 1);
         strcpy(name, argv[optind]);
     } else {
+        if (compiler != NULL) free(compiler);
+        if (std != NULL) free(std);
         mpg_msg = malloc(29);
         mpg_status = 1;
         strcpy(mpg_msg, "no name provided for project");
@@ -175,6 +175,4 @@ struct Project *get_proj(const char *prog, int argc, char **argv) {
     return project;
 }
 
-void mpg_quit() {
-    free(mpg_msg);
-}
+void mpg_quit() { free(mpg_msg); }
