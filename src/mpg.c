@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,9 +27,16 @@ void destroy_proj(struct Project *project) {
     free(project);
 }
 
+void set_err(char *err) {
+    mpg_msg = malloc(256);
+        strcat(mpg_msg, err);
+        strcat(mpg_msg, strerror(errno));
+        mpg_msg = realloc(mpg_msg, strlen(mpg_msg) + 1);
+}
+
 int change_dir(const char *dir) {
     if (chdir(dir) == -1) {
-        perror("mpg: chdir");
+        set_err("chdir: ");
         return 1;
     }
     return 0;
@@ -36,7 +44,7 @@ int change_dir(const char *dir) {
 
 int make_dir(const char *dir) {
     if (mkdir(dir, S_IRWXU) == -1) {
-        perror("mpg: mkdir");
+        set_err("mkdir: ");
         return 1;
     }
     return 0;
@@ -51,7 +59,7 @@ int build_proj_dir(struct Project *project) {
 
     FILE *file = fopen("Makefile", "w");
     if (file == NULL) {
-        perror("mpg: fopen");
+        set_err("fopen: ");
         return 1;
     }
 
@@ -75,7 +83,7 @@ int build_proj_dir(struct Project *project) {
 
     file = fopen(project->cxx ? "main.cc" : "main.c", "w");
     if (file == NULL) {
-        perror("mpg: fopen");
+        set_err("fopen: ");
         return 1;
     }
 
@@ -143,9 +151,9 @@ struct Project *get_proj(const char *prog, int argc, char **argv) {
         name = malloc(strlen(argv[optind]) + 1);
         strcpy(name, argv[optind]);
     } else {
-        mpg_msg = malloc(34);
+        mpg_msg = malloc(29);
         mpg_status = 1;
-        strcpy(mpg_msg, "mpg: no name provided for project");
+        strcpy(mpg_msg, "no name provided for project");
         return NULL;
     }
 
