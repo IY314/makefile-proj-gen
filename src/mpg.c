@@ -5,7 +5,7 @@
 #include <string.h>
 #include <sys/stat.h>
 
-#include "mpg.h"
+#include "mpg/mpg.h"
 
 char *mpg_msg = NULL;
 int mpg_status = 0;

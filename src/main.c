@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "mpg.h"
+#include "mpg/mpg.h"
 
 int main(int argc, char **argv) {
     struct Project *proj = get_proj("mpg", argc, argv);

@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "mpg.h"
+#include "mpg/mpg.h"
 
 int main() {
     char *opts[6] = {"mpg", "-c", "cc", "-s", "c99", "proj"};
