@@ -1,9 +1,9 @@
 #include <stdio.h>
 
-#include "mpg/mpg.h"
+#include "mpg.h"
 
-int main(int argc, char **argv) {
-    struct Project *proj = get_proj("mpg", argc, argv);
+int main(const int argc, char *const *argv) {
+    struct Project *const proj = get_proj("mpg", argc, argv);
     if (proj == NULL) {
         printf("mpg: %s\n", mpg_msg);
         mpg_quit();
