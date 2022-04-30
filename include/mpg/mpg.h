@@ -8,11 +8,12 @@ extern int mpg_status;
 
 struct Project {
     char *name, *compiler, *std;
-    int cxx, git;
+    int cxx, git, makefile;
 };
 
 struct Project *init_proj(const char *const name, const char *const compiler,
-                          const char *const std, const int cxx, const int git);
+                          const char *const std, const int cxx, const int git,
+                          const int makefile);
 
 int build_proj_dir(struct Project *const project);
 

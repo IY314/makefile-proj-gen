@@ -50,23 +50,25 @@
     "bin\n"       \
     "obj"
 
-#define HELP                                        \
-    "Usage: %s [OPTION]... [PROJECT]\n"             \
-    "\n"                                            \
-    "Create a new C/C++ Makefile project.\n"        \
-    "\n"                                            \
-    "Options:\n"                                    \
-    "  -v, --version\n"                             \
-    "      Print version and exit.\n"               \
-    "  -h, --help\n"                                \
-    "      Print this message and exit.\n"          \
-    "  -+, --cxx\n"                                 \
-    "      Create a C++ project.\n"                 \
-    "  -g, --git\n"                                 \
-    "      Initialize a Git repo in the project.\n" \
-    "  -c, --compiler\n"                            \
-    "      Specify the compiler to use.\n"          \
-    "  -s, --std\n"                                 \
+#define HELP                                            \
+    "Usage: %s [OPTION]... [PROJECT]\n"                 \
+    "\n"                                                \
+    "Create a new C/C++ Makefile project.\n"            \
+    "\n"                                                \
+    "Options:\n"                                        \
+    "  -v, --version\n"                                 \
+    "      Print version and exit.\n"                   \
+    "  -h, --help\n"                                    \
+    "      Print this message and exit.\n"              \
+    "  -+, --cxx\n"                                     \
+    "      Create a C++ project.\n"                     \
+    "  -g, --git\n"                                     \
+    "      Initialize a Git repo in the project.\n"     \
+    "  -m, --makefile\n"                                \
+    "      Generate a makefile in current directory.\n" \
+    "  -c, --compiler\n"                                \
+    "      Specify the compiler to use.\n"              \
+    "  -s, --std\n"                                     \
     "      Specify the C/C++ standard to use.\n"
 
 void set_err(const char *const err);

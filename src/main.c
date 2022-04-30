@@ -11,9 +11,9 @@ int main(const int argc, char *const *argv) {
     }
 
     if (build_proj_dir(proj) == 0) {
-        printf("mpg: created project '%s'\n", proj->name);
+        printf("mpg: created '%s'\n", proj->name);
     } else {
-        printf("mpg: failed to create project '%s'\n", proj->name);
+        printf("mpg: failed to create '%s'\n", proj->name);
     }
 
     destroy_proj(proj);

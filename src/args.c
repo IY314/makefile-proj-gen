@@ -5,6 +5,22 @@
 
 #include "mpg.h"
 
+#define flag(s, var) \
+    case s:          \
+        var = 1;     \
+        break
+
+#define str_flag(s, var)                  \
+    case s:                               \
+        var = malloc(strlen(optarg) + 1); \
+        strcpy(var, optarg);              \
+        break
+
+#define func_null_flag(s, func) \
+    case s:                     \
+        func;                   \
+        return NULL
+
 void version(const char *const prog) {
     mpg_msg = malloc(sizeof(char) * 32);
     sprintf(mpg_msg, "%s version %d.%d\n", prog, VERSION_MAJ, VERSION_MIN);
@@ -20,6 +36,7 @@ struct Project *get_proj(const char *const prog, const int argc,
     int opt, optidx;
     int cxx = 0;
     int git = 0;
+    int makefile = 0;
     char *name = NULL;
     char *compiler = NULL;
     char *std = NULL;
@@ -27,42 +44,26 @@ struct Project *get_proj(const char *const prog, const int argc,
                                     {"help", no_argument, 0, 'h'},
                                     {"c++", no_argument, &cxx, 1},
                                     {"git", no_argument, &git, 1},
+                                    {"makefile", no_argument, &makefile, 1},
                                     {"compiler", required_argument, 0, 'c'},
                                     {"std", required_argument, 0, 's'},
                                     {0, 0, 0, 0}};
 
-    while ((opt = getopt_long(argc, argv, "vh+gc:s:", long_options, &optidx)) !=
-           -1) {
+    while ((opt = getopt_long(argc, argv, "vh+gmc:s:", long_options,
+                              &optidx)) != -1) {
         switch (opt) {
-            case 0:
-                break;
-            case 'v':
-                version(prog);
-                return NULL;
-                break;
-            case 'h':
-                help(prog);
-                return NULL;
-                break;
-            case '+':
-                cxx = 1;
-                break;
-            case 'g':
-                git = 1;
-                break;
-            case 'c':
-                compiler = malloc(strlen(optarg) + 1);
-                strcpy(compiler, optarg);
-                break;
-            case 's':
-                std = malloc(strlen(optarg) + 1);
-                strcpy(std, optarg);
-                break;
+            func_null_flag('v', version(prog));
+            func_null_flag('h', help(prog));
+            flag('+', cxx);
+            flag('g', git);
+            flag('m', makefile);
+            str_flag('c', compiler);
+            str_flag('s', std);
             case '?':
                 return NULL;
                 break;
             default:
-                abort();
+                if (opt != 0) abort();
                 break;
         }
     }
@@ -88,7 +89,8 @@ struct Project *get_proj(const char *const prog, const int argc,
         strcpy(std, cxx ? "c++11" : "c99");
     }
 
-    struct Project *project = init_proj(name, compiler, std, cxx, git);
+    struct Project *project =
+        init_proj(name, compiler, std, cxx, git, makefile);
     free(name);
     free(compiler);
     free(std);
