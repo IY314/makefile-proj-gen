@@ -5,7 +5,7 @@
 #include "mpg.h"
 
 struct Project *init_proj(const char *name, const char *compiler,
-                          const char *std, const int cxx) {
+                          const char *std, const int cxx, const int git) {
     struct Project *project = malloc(sizeof(struct Project));
     project->name = malloc(strlen(name) + 1);
     project->compiler = malloc(strlen(compiler) + 1);
@@ -14,6 +14,7 @@ struct Project *init_proj(const char *name, const char *compiler,
     strcpy(project->compiler, compiler);
     strcpy(project->std, std);
     project->cxx = cxx;
+    project->git = git;
     return project;
 }
 
@@ -23,6 +24,8 @@ int build_proj_dir(struct Project *const project) {
     // Create project directory and change into it
     if (make_dir(project->name)) return 1;
     if (change_dir(project->name)) return 1;
+
+    if (project->git) git_init();
 
     // Create directories inside project
     if (make_dir("src")) return 1;
@@ -50,6 +53,18 @@ int build_proj_dir(struct Project *const project) {
 
     fclose(file);
 
+    if (project->git) {  // Open .gitignore in root of project
+        file = fopen(".gitignore", "w");
+        if (file == NULL) {
+            set_err("fopen: ");
+            return 1;
+        }
+
+        // Populate .gitignore with content
+        fputs(GITIGNORE, file);
+        fclose(file);
+    }
+
     // Change into source directory
     if (change_dir("src")) return 1;
 
@@ -63,6 +78,10 @@ int build_proj_dir(struct Project *const project) {
     // Populate source file with content
     fprintf(file, project->cxx ? CXX_SOURCE : C_SOURCE);
     fclose(file);
+
+    if (change_dir("..")) return 1;
+
+    if (project->git) git_commit("Init");
 
     return 0;
 }

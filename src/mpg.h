@@ -46,21 +46,27 @@
     "clean:\n"                                      \
     "\t@rm -rf $(TARGET) obj\n"
 
-#define HELP                                 \
-    "Usage: %s [OPTION]... [PROJECT]\n"      \
-    "\n"                                     \
-    "Create a new C/C++ Makefile project.\n" \
-    "\n"                                     \
-    "Options:\n"                             \
-    "  -v, --version\n"                      \
-    "      Print version and exit.\n"        \
-    "  -h, --help\n"                         \
-    "      Print this message and exit.\n"   \
-    "  -+, --cxx\n"                          \
-    "      Create a C++ project.\n"          \
-    "  -c, --compiler\n"                     \
-    "      Specify the compiler to use.\n"   \
-    "  -s, --std\n"                          \
+#define GITIGNORE \
+    "bin\n"       \
+    "obj"
+
+#define HELP                                        \
+    "Usage: %s [OPTION]... [PROJECT]\n"             \
+    "\n"                                            \
+    "Create a new C/C++ Makefile project.\n"        \
+    "\n"                                            \
+    "Options:\n"                                    \
+    "  -v, --version\n"                             \
+    "      Print version and exit.\n"               \
+    "  -h, --help\n"                                \
+    "      Print this message and exit.\n"          \
+    "  -+, --cxx\n"                                 \
+    "      Create a C++ project.\n"                 \
+    "  -g, --git\n"                                 \
+    "      Initialize a Git repo in the project.\n" \
+    "  -c, --compiler\n"                            \
+    "      Specify the compiler to use.\n"          \
+    "  -s, --std\n"                                 \
     "      Specify the C/C++ standard to use.\n"
 
 void set_err(const char *const err);
@@ -72,3 +78,7 @@ int make_dir(const char *const dir);
 void version(const char *const prog);
 
 void help(const char *const prog);
+
+void git_init();
+
+void git_commit(const char *const msg);

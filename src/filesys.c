@@ -1,3 +1,5 @@
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -20,4 +22,14 @@ int make_dir(const char *const dir) {
         return 1;
     }
     return 0;
+}
+
+void git_init() { system("git init"); }
+
+void git_commit(const char *const msg) {
+    system("git add .");
+    char *const command = malloc(sizeof(char) * (strlen(msg) + 15));
+    sprintf(command, "git commit -m \"%s\"", msg);
+    system(command);
+    free(command);
 }

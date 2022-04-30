@@ -5,7 +5,7 @@ INCLUDE := -Iinclude
 
 EXEC := bin/mpg
 LIB := bin/libmpg.a
-OBJECTS := obj/mpg.o obj/args.o obj/dir.o obj/proj.o
+OBJECTS := obj/mpg.o obj/args.o obj/filesys.o obj/proj.o
 
 .PHONY: all clean clean-obj clean-lib clean-exec clean-tests
 

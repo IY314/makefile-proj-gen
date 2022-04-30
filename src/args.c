@@ -19,17 +19,19 @@ struct Project *get_proj(const char *const prog, const int argc,
                          char *const *argv) {
     int opt, optidx;
     int cxx = 0;
+    int git = 0;
     char *name = NULL;
     char *compiler = NULL;
     char *std = NULL;
     struct option long_options[] = {{"version", no_argument, 0, 'v'},
                                     {"help", no_argument, 0, 'h'},
                                     {"c++", no_argument, &cxx, 1},
+                                    {"git", no_argument, &git, 1},
                                     {"compiler", required_argument, 0, 'c'},
                                     {"std", required_argument, 0, 's'},
                                     {0, 0, 0, 0}};
 
-    while ((opt = getopt_long(argc, argv, "vh+c:s:", long_options, &optidx)) !=
+    while ((opt = getopt_long(argc, argv, "vh+gc:s:", long_options, &optidx)) !=
            -1) {
         switch (opt) {
             case 0:
@@ -44,6 +46,9 @@ struct Project *get_proj(const char *const prog, const int argc,
                 break;
             case '+':
                 cxx = 1;
+                break;
+            case 'g':
+                git = 1;
                 break;
             case 'c':
                 compiler = malloc(strlen(optarg) + 1);
@@ -83,7 +88,7 @@ struct Project *get_proj(const char *const prog, const int argc,
         strcpy(std, cxx ? "c++11" : "c99");
     }
 
-    struct Project *project = init_proj(name, compiler, std, cxx);
+    struct Project *project = init_proj(name, compiler, std, cxx, git);
     free(name);
     free(compiler);
     free(std);
