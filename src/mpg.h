@@ -71,6 +71,8 @@
     "  -s, --std\n"                                     \
     "      Specify the C/C++ standard to use.\n"
 
+#define MAX_ERR_LEN 256
+
 void set_err(const char *const err);
 
 int change_dir(const char *const dir);

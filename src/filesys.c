@@ -5,9 +5,11 @@
 #include <unistd.h>
 
 #include "mpg.h"
+#include "util.h"
 
 int change_dir(const char *const dir) {
-    if (strcmp(dir, "") == 0) return 1;
+    if (str_empty(dir)) return 1;
+
     if (chdir(dir) == -1) {
         set_err("chdir: ");
         return 1;
@@ -16,7 +18,8 @@ int change_dir(const char *const dir) {
 }
 
 int make_dir(const char *const dir) {
-    if (strcmp(dir, "") == 0) return 1;
+    if (str_empty(dir)) return 1;
+
     if (mkdir(dir, S_IRWXU) == -1) {
         set_err("mkdir: ");
         return 1;
@@ -27,9 +30,20 @@ int make_dir(const char *const dir) {
 void git_init() { system("git init"); }
 
 void git_commit(const char *const msg) {
+    if (str_empty(msg)) return;
+
+    static char *cmd;
+
     system("git add .");
-    char *const command = malloc(sizeof(char) * (strlen(msg) + 15));
-    sprintf(command, "git commit -m \"%s\"", msg);
-    system(command);
-    free(command);
+
+    malloc_struct_array(cmd, char, strlen(msg) + 15, {
+        set_err("Could not allocate memory for git commit command.\n");
+        return;
+    });
+
+    sprintf(cmd, "git commit -m \"%s\"", msg);
+
+    system(cmd);
+
+    free_if_notnull(cmd);
 }

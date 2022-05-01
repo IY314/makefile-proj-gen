@@ -1,10 +1,11 @@
 #include <stdio.h>
 
 #include "mpg.h"
+#include "util.h"
 
 int main(const int argc, char *const *argv) {
     struct Project *const proj = get_proj("mpg", argc, argv);
-    if (proj == NULL) {
+    if (is_null(proj)) {
         printf("mpg: %s\n", mpg_msg);
         mpg_quit();
         return mpg_status;
